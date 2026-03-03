@@ -5,6 +5,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Api.Authentication;
+using SurveyBasket.Api.Errors;
 using SurveyBasket.Api.Services;
 using System.Reflection;
 using System.Text;
@@ -42,6 +43,9 @@ public static class DependencyInjection
         //register services
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IAuthService, AuthService>();
+
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
 
         return services;
     }
