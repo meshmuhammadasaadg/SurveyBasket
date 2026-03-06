@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using SurveyBasket.Api.Contracts.Polls;
+using SurveyBasket.Api.Errors;
 using SurveyBasket.Api.Services;
 
 namespace SurveyBasket.Api.Controllers;
@@ -44,13 +45,12 @@ public class PollsController(IPollService pollService) : ControllerBase
     {
         var result = await _pollService.UpdateAsync(id, request, cancellationToken);
 
-        if (result.IsFailure && result.Error.Code == "NotFound")
-            return result.ToProblem(StatusCodes.Status404NotFound);
+        if (result.IsSuccess)
+            return NoContent();
 
-        if (result.IsFailure)
-            return result.ToProblem(StatusCodes.Status409Conflict);
-
-        return NoContent();
+        return (result.Error.Equals(PollErrors.ExistingTitle))
+                ? result.ToProblem(StatusCodes.Status409Conflict)
+                : result.ToProblem(StatusCodes.Status404NotFound);
     }
 
     [HttpPut("{id}/togglePublish")]
