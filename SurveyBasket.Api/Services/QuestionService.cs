@@ -1,0 +1,117 @@
+﻿using Mapster;
+using SurveyBasket.Api.Contracts.Questions;
+using SurveyBasket.Api.Errors;
+
+namespace SurveyBasket.Api.Services;
+
+public class QuestionService(ApplicationDbContext context) : IQuestionService
+{
+    private readonly ApplicationDbContext _context = context;
+
+    public async Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int pollId, CancellationToken cancellationToken = default)
+    {
+        var pollIsExists = await _context.Polls.AnyAsync(c => c.Id == pollId, cancellationToken);
+
+        if (!pollIsExists)
+            return Result.Failure<IEnumerable<QuestionResponse>>(PollErrors.PollNotFound);
+
+        var questions = await _context.Questions
+            .Where(c => c.PollId == pollId)
+            //.Include(a => a.Answers)
+            //.Select(q => new QuestionResponse(
+            //    q.Id,
+            //    q.Content,
+            //    q.Answers.Select(a => new AnswerResponse(a.Id, a.Content))
+            //    ))
+            .ProjectToType<QuestionResponse>()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return Result.Success<IEnumerable<QuestionResponse>>(questions);
+    }
+
+    public async Task<Result<QuestionResponse>> GetByIdAsync(int pollId, int id, CancellationToken cancellationToken = default)
+    {
+        var question = await _context.Questions
+            .Where(c => c.PollId == pollId && c.Id == id)
+            .ProjectToType<QuestionResponse>()
+            .AsNoTracking().SingleOrDefaultAsync(cancellationToken);
+
+        if (question is null)
+            return Result.Failure<QuestionResponse>(QuestionErrors.QuestionNotFound);
+
+        return Result.Success(question);
+    }
+
+    public async Task<Result<QuestionResponse>> AddAsync(int pollId, QuestionRequest request, CancellationToken cancellationToken = default)
+    {
+        var pollIsExists = await _context.Polls.AnyAsync(c => c.Id == pollId, cancellationToken);
+
+        if (!pollIsExists)
+            return Result.Failure<QuestionResponse>(PollErrors.PollNotFound);
+
+        var QuestionIsExists = await _context.Questions.AnyAsync(c => c.PollId == pollId && c.Content == request.Content);
+
+        if (QuestionIsExists)
+            return Result.Failure<QuestionResponse>(QuestionErrors.DuplicatedQuestion);
+
+        var question = request.Adapt<Question>();
+        question.PollId = pollId;
+
+        await _context.Questions.AddAsync(question, cancellationToken);
+        await _context.SaveChangesAsync();
+
+        return Result.Success(question.Adapt<QuestionResponse>());
+    }
+
+    public async Task<Result> UpdateAsync(int pollId, int id, QuestionRequest request, CancellationToken cancellationToken = default)
+    {
+        var questionIsExists = await _context.Questions
+            .AnyAsync(c => c.PollId == pollId
+            && c.Id != id
+            && c.Content == request.Content
+            , cancellationToken);
+
+        if (questionIsExists)
+            return Result.Failure(QuestionErrors.DuplicatedQuestion);
+
+        var question = await _context.Questions.Include(x => x.Answers)
+            .SingleOrDefaultAsync(c => c.PollId == pollId && c.Id == id, cancellationToken);
+
+        if (question is null)
+            return Result.Failure(QuestionErrors.QuestionNotFound);
+
+        question.Content = request.Content;
+
+        var currentAnswers = question.Answers.Select(c => c.Content).ToList();
+
+        var newAnswers = request.Answers.Except(currentAnswers).ToList();
+
+        foreach (var answers in newAnswers)
+        {
+            question.Answers.Add(new Answer { Content = answers });
+        }
+
+        question.Answers.ToList().ForEach(answers =>
+        {
+            answers.IsActive = request.Answers.Contains(answers.Content);
+        });
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ToggleStatusAsync(int pollId, int id, CancellationToken cancellationToken = default)
+    {
+        var question = await _context.Questions.SingleOrDefaultAsync(c => c.PollId == pollId && c.Id == id, cancellationToken);
+
+        if (question is null)
+            return Result.Failure(QuestionErrors.QuestionNotFound);
+
+        question.IsActive = !question.IsActive;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+}

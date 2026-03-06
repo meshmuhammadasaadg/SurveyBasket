@@ -6,13 +6,23 @@ namespace SurveyBasket.Api.Presistence;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
     : IdentityDbContext<AppUser>(options)
 {
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor; 
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public DbSet<Poll> Polls { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Answer> Answers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+
+        var cascadeFks = builder.Model.GetEntityTypes()
+                    .SelectMany(t => t.GetForeignKeys())
+                    .Where(fk => fk.DeleteBehavior == DeleteBehavior.Cascade && !fk.IsOwnership);
+
+        foreach (var fk in cascadeFks)
+            fk.DeleteBehavior = DeleteBehavior.Restrict;
+
         base.OnModelCreating(builder);
     }
 
@@ -24,7 +34,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         foreach (var entity in entries)
         {
-            if (entity.State == EntityState.Added)  
+            if (entity.State == EntityState.Added)
                 entity.Property(c => c.CreatedById).CurrentValue = currentUserId;
 
             else if (entity.State == EntityState.Modified)
