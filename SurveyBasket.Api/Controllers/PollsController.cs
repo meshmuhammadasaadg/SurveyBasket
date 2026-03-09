@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using SurveyBasket.Api.Contracts.Polls;
-using SurveyBasket.Api.Errors;
 using SurveyBasket.Api.Services;
 
 namespace SurveyBasket.Api.Controllers;
@@ -20,6 +19,14 @@ public class PollsController(IPollService pollService) : ControllerBase
         return Ok(polls);
     }
 
+    [HttpGet("current")]
+    public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
+    {
+        var polls = await _pollService.GetCurrentAsync(cancellationToken);
+
+        return Ok(polls);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken cancellationToken)
     {
@@ -27,7 +34,7 @@ public class PollsController(IPollService pollService) : ControllerBase
 
         return result.IsSuccess
             ? Ok(result.Value)
-            : result.ToProblem(StatusCodes.Status404NotFound);
+            : result.ToProblem();
     }
 
     [HttpPost("")]
@@ -37,7 +44,7 @@ public class PollsController(IPollService pollService) : ControllerBase
 
         return result.IsSuccess ?
             CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value)
-            : result.ToProblem(StatusCodes.Status409Conflict);
+            : result.ToProblem();
     }
 
     [HttpPut("{id}")]
@@ -45,12 +52,7 @@ public class PollsController(IPollService pollService) : ControllerBase
     {
         var result = await _pollService.UpdateAsync(id, request, cancellationToken);
 
-        if (result.IsSuccess)
-            return NoContent();
-
-        return (result.Error.Equals(PollErrors.ExistingTitle))
-                ? result.ToProblem(StatusCodes.Status409Conflict)
-                : result.ToProblem(StatusCodes.Status404NotFound);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
     [HttpPut("{id}/togglePublish")]
@@ -59,7 +61,7 @@ public class PollsController(IPollService pollService) : ControllerBase
         var result = await _pollService.TogglePublishAsync(id, cancellationToken);
 
         return result.IsSuccess ? NoContent()
-            : result.ToProblem(StatusCodes.Status404NotFound);
+            : result.ToProblem();
     }
 
     [HttpDelete("{id}")]
@@ -68,6 +70,6 @@ public class PollsController(IPollService pollService) : ControllerBase
         var result = await _pollService.DeleteAsync(id, cancellationToken);
 
         return result.IsSuccess ? NoContent()
-            : result.ToProblem(StatusCodes.Status404NotFound);
+            : result.ToProblem();
     }
 }
