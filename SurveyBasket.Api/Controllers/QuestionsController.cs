@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using SurveyBasket.Api.Contracts.Questions;
-using SurveyBasket.Api.Errors;
 using SurveyBasket.Api.Services;
 
 namespace SurveyBasket.Api.Controllers;
@@ -17,7 +16,7 @@ public class QuestionsController(IQuestionService questionService) : ControllerB
     {
         var result = await _questionService.GetAllAsync(pollId, cancellationToken);
 
-        return result.IsSuccess ? Ok(result.Value) : result.ToProblem(StatusCodes.Status404NotFound);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 
     [HttpGet("{id}")]
@@ -25,7 +24,7 @@ public class QuestionsController(IQuestionService questionService) : ControllerB
     {
         var result = await _questionService.GetByIdAsync(pollId, id, cancellationToken);
 
-        return result.IsSuccess ? Ok(result.Value) : result.ToProblem(StatusCodes.Status404NotFound);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 
     [HttpPost("")]
@@ -33,25 +32,15 @@ public class QuestionsController(IQuestionService questionService) : ControllerB
     {
         var result = await _questionService.AddAsync(pollId, request, cancellationToken);
 
-        if (result.IsSuccess)
-            return CreatedAtAction(nameof(GetById), new { pollId, result.Value.Id }, result.Value);
-
-        return (result.Error.Equals(QuestionErrors.DuplicatedQuestion))
-                ? result.ToProblem(StatusCodes.Status409Conflict)
-                : result.ToProblem(StatusCodes.Status404NotFound);
+        return result.IsSuccess ? CreatedAtAction(nameof(GetById), new { pollId, result.Value.Id }, result.Value)
+            : result.ToProblem();
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] int pollId, [FromRoute] int id, [FromBody] QuestionRequest request, CancellationToken cancellationToken)
     {
         var result = await _questionService.UpdateAsync(pollId, id, request, cancellationToken);
-
-        if (result.IsSuccess)
-            return NoContent();
-
-        return (result.Error.Equals(QuestionErrors.DuplicatedQuestion))
-                ? result.ToProblem(StatusCodes.Status409Conflict)
-                : result.ToProblem(StatusCodes.Status404NotFound);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
     [HttpDelete("{id}")]
@@ -59,6 +48,6 @@ public class QuestionsController(IQuestionService questionService) : ControllerB
     {
         var result = await _questionService.ToggleStatusAsync(pollId, id, cancellationToken);
 
-        return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 }
