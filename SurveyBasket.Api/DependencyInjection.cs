@@ -18,6 +18,7 @@ public static class DependencyInjection
     {
         services.AddControllers();
         services.AddOpenApi();
+        services.AddDistributedMemoryCache();   //caching service
 
         var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
 
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IVoteService, VoteService>();
+        services.AddScoped<ICacheService, CacheService>();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
