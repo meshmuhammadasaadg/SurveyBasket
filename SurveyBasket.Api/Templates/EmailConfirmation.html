@@ -1,0 +1,409 @@
+﻿<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Your Email – SurveyBasket</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0d0f14;
+            font-family: "DM Sans", sans-serif;
+            color: #e8e6f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+            background-image: radial-gradient( ellipse 80% 60% at 50% -10%, rgba(99, 60, 255, 0.18) 0%, transparent 70% ), radial-gradient( ellipse 40% 40% at 90% 80%, rgba(255, 100, 60, 0.08) 0%, transparent 60% );
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        /* ── Logo bar ── */
+        .logo-bar {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+            .logo-bar .brand {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #7c5cfc, #b67cfc);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .logo-icon svg {
+                display: block;
+            }
+
+        .brand-name {
+            font-family: "DM Serif Display", serif;
+            font-size: 22px;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: #181c27;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.1), 0 40px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ── Hero banner ── */
+        .hero {
+            background: linear-gradient( 135deg, #1e1535 0%, #16112b 60%, #1a1430 100% );
+            padding: 48px 40px 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .hero::before {
+                content: "";
+                position: absolute;
+                top: -60px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 300px;
+                height: 300px;
+                background: radial-gradient( circle, rgba(124, 92, 252, 0.25), transparent 70% );
+                pointer-events: none;
+            }
+
+        .envelope-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient( 135deg, rgba(124, 92, 252, 0.2), rgba(182, 124, 252, 0.2) );
+            border: 1px solid rgba(124, 92, 252, 0.4);
+            border-radius: 22px;
+            margin-bottom: 28px;
+            box-shadow: 0 0 40px rgba(124, 92, 252, 0.2);
+        }
+
+        .hero h1 {
+            font-family: "DM Serif Display", serif;
+            font-size: 30px;
+            font-weight: 400;
+            color: #ffffff;
+            line-height: 1.25;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            font-size: 15px;
+            color: #9b97b2;
+            line-height: 1.65;
+            font-weight: 300;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+
+            .hero p strong {
+                color: #c5bff5;
+                font-weight: 500;
+            }
+
+        /* ── Body ── */
+        .body {
+            padding: 40px;
+        }
+
+        /* ── CTA button ── */
+        .cta-wrapper {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 15px 44px;
+            background: linear-gradient(135deg, #7c5cfc, #9b7cfd);
+            color: #ffffff;
+            font-family: "DM Sans", sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 14px;
+            letter-spacing: 0.2px;
+            box-shadow: 0 4px 20px rgba(124, 92, 252, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transition: all 0.2s ease;
+        }
+
+            .cta-btn:hover {
+                background: linear-gradient(135deg, #8d6ffd, #ab8ffd);
+                box-shadow: 0 6px 28px rgba(124, 92, 252, 0.55);
+                transform: translateY(-1px);
+            }
+
+        /* ── Divider ── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .divider-text {
+            font-size: 12px;
+            color: #5c5879;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ── Fallback link ── */
+        .fallback {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 32px;
+        }
+
+            .fallback p {
+                font-size: 12.5px;
+                color: #6b6785;
+                margin-bottom: 8px;
+                line-height: 1.5;
+            }
+
+        .fallback-url {
+            font-size: 12px;
+            color: #8b7cfc;
+            word-break: break-all;
+            font-family: "Courier New", monospace;
+            background: rgba(124, 92, 252, 0.08);
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: block;
+            border: 1px solid rgba(124, 92, 252, 0.15);
+        }
+
+        /* ── Expiry notice ── */
+        .expiry {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(255, 180, 50, 0.06);
+            border: 1px solid rgba(255, 180, 50, 0.15);
+            border-radius: 12px;
+            margin-bottom: 36px;
+        }
+
+        .expiry-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .expiry p {
+            font-size: 13px;
+            color: #b8a56a;
+            line-height: 1.55;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 28px 40px;
+            text-align: center;
+        }
+
+            .footer p {
+                font-size: 12.5px;
+                color: #413d5a;
+                line-height: 1.7;
+                margin-bottom: 6px;
+            }
+
+            .footer a {
+                color: #6858c4;
+                text-decoration: none;
+            }
+
+                .footer a:hover {
+                    color: #9b7cfd;
+                }
+
+            .footer .tagline {
+                font-size: 11px;
+                color: #2e2b42;
+                margin-top: 14px;
+                font-weight: 500;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Logo -->
+        <div class="logo-bar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <rect x="2"
+                              y="5"
+                              width="16"
+                              height="3"
+                              rx="1.5"
+                              fill="white"
+                              opacity="0.9" />
+                        <rect x="2"
+                              y="10"
+                              width="10"
+                              height="3"
+                              rx="1.5"
+                              fill="white"
+                              opacity="0.6" />
+                        <rect x="2"
+                              y="15"
+                              width="13"
+                              height="2"
+                              rx="1"
+                              fill="white"
+                              opacity="0.35" />
+                    </svg>
+                </div>
+                <span class="brand-name">SurveyBasket</span>
+            </div>
+        </div>
+
+        <!-- Card -->
+        <div class="card">
+            <!-- Hero -->
+            <div class="hero">
+                <div class="envelope-icon">
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                        <rect x="4"
+                              y="8"
+                              width="28"
+                              height="20"
+                              rx="4"
+                              stroke="#a78bfa"
+                              stroke-width="1.5"
+                              fill="none" />
+                        <path d="M4 12l14 9 14-9"
+                              stroke="#a78bfa"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              fill="none" />
+                        <circle cx="27" cy="10" r="5" fill="#7c5cfc" />
+                        <path d="M25 10l1.5 1.5L29 8.5"
+                              stroke="white"
+                              stroke-width="1.3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round" />
+                    </svg>
+                </div>
+
+                <h1>Confirm your<br /><em>email address</em></h1>
+                <p>
+                    Thanks for signing up to <strong>SurveyBasket</strong>.<br />
+                    One quick step — verify your email to activate your account and
+                    start creating surveys.
+                </p>
+            </div>
+
+            <!-- Body -->
+            <div class="body">
+                <!-- CTA -->
+                <div class="cta-wrapper">
+                    <a href="{{confirmationLink}}" class="cta-btn">
+                        Verify My Email Address
+                    </a>
+                </div>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">or use this link</span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <!-- Fallback -->
+                <div class="fallback">
+                    <p>
+                        If the button above doesn't work, copy and paste this URL into
+                        your browser:
+                    </p>
+                    <span class="fallback-url">{{confirmationLink}}</span>
+                </div>
+
+                <!-- Expiry -->
+                <div class="expiry">
+                    <div class="expiry-icon">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <circle cx="8"
+                                    cy="8"
+                                    r="6.5"
+                                    stroke="#b8a56a"
+                                    stroke-width="1.3" />
+                            <path d="M8 4.5V8l2.5 2"
+                                  stroke="#b8a56a"
+                                  stroke-width="1.3"
+                                  stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <p>
+                        This link will expire in <strong>24 hours</strong>. If it expires,
+                        you can request a new confirmation email from the login page.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>
+                    If you didn't create a SurveyBasket account, you can safely ignore
+                    this email.
+                </p>
+                <p>
+                    Need help?
+                    <a href="mailto:support@surveybasket.com">Contact Support</a>
+                    &nbsp;·&nbsp;
+                    <a href="#">Privacy Policy</a>
+                    &nbsp;·&nbsp;
+                    <a href="#">Unsubscribe</a>
+                </p>
+                <p class="tagline">© 2026 SurveyBasket · All rights reserved</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
