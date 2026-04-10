@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using SurveyBasket.Api.Helpers;
 using System.Security.Cryptography;
@@ -33,6 +34,7 @@ public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser
             return Result.Failure<AuthResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
         }
 
+        //BackgroundJob.Enqueue(() => );
         await SendConfirmationEmail(user);
 
         return Result.Success();
@@ -181,9 +183,7 @@ public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-        var request = _httpContextAccessor.HttpContext!.Request;
-
-        var origin = request.Headers.Origin.FirstOrDefault() ?? $"{request.Scheme}://{request.Host}";
+        var origin = _httpContextAccessor.HttpContext!.Request.Headers.Origin;
 
         var emailBody = await EmailBodyBuilder.GenerateEmailBody("EmailConfirmation",
             new Dictionary<string, string>
@@ -191,7 +191,7 @@ public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser
                 ["{{confirmationLink}}"] = $"{origin}/auth/confirmation-email?userId={user.Id}&code={code}"
             });
 
-        await _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Email Confirmation", emailBody);
+        BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Email Confirmation", emailBody));
     }
     private static string GenerateRefreshToken() =>
     Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));

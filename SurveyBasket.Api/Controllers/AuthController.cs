@@ -40,7 +40,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost("confirmation-email")]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailRequest request)
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
         var result = await _authService.ConfirmationEmailAsync(request);
 
@@ -48,7 +48,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost("resend-confirmation-email")]
-    public async Task<IActionResult> ResendConfirmEmail([FromQuery] ResendConfirmationEmailRequest request)
+    public async Task<IActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmailRequest request)
     {
         var result = await _authService.ResendConfirmationEmailAsync(request.Email);
 
