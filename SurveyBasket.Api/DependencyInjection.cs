@@ -1,4 +1,5 @@
 ﻿
+using Hangfire;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using SurveyBasket.Api.Settings;
 
@@ -36,19 +37,21 @@ public static class DependencyInjection
         //register services
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IEmailSender, EmailService>();
-
+        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<ICacheService, CacheService>();
 
+        services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
 
+        services.AddHangfireConfig(configuration);
+
         services.AddHttpContextAccessor();
 
-        services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
 
         return services;
     }
@@ -112,6 +115,19 @@ public static class DependencyInjection
             options.SignIn.RequireConfirmedEmail = true;
             options.User.RequireUniqueEmail = true;
         });
+
+        return services;
+    }
+
+    private static IServiceCollection AddHangfireConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+
+        services.AddHangfireServer();
 
         return services;
     }
