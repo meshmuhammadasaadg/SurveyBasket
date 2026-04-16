@@ -10,12 +10,14 @@ global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Microsoft.Extensions.Options;
 global using Microsoft.IdentityModel.Tokens;
 global using SurveyBasket.Api.Abstractions;
+global using SurveyBasket.Api.Abstractions.Constants;
 global using SurveyBasket.Api.Authentication;
 global using SurveyBasket.Api.Contracts.Authentication;
+global using SurveyBasket.Api.Contracts.User;
 global using SurveyBasket.Api.Entities;
 global using SurveyBasket.Api.Errors;
+global using SurveyBasket.Api.Extensions;
 global using SurveyBasket.Api.Presistence;
 global using SurveyBasket.Api.Services;
 global using System.Reflection;
 global using System.Text;
-

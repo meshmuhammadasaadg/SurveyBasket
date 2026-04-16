@@ -42,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<IUserService, UserService>();
 
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
 
@@ -77,7 +78,7 @@ public static class DependencyInjection
     {
         services.AddSingleton<IJwtProvider, JwtProvider>();
 
-        services.AddIdentity<AppUser, IdentityRole>()
+        services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 

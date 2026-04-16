@@ -7,6 +7,6 @@ public class AuditableEntity
     public string? UpdatedById { get; set; }
     public DateTime? UpdatedOn { get; set; }
 
-    public AppUser CreatedBy { get; set; } = default!; 
-    public AppUser? UpdatedBy { get; set; }
+    public ApplicationUser CreatedBy { get; set; } = default!; 
+    public ApplicationUser? UpdatedBy { get; set; }
 }

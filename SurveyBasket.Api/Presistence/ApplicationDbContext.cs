@@ -4,7 +4,7 @@ using SurveyBasket.Api.Extensions;
 namespace SurveyBasket.Api.Presistence;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
-    : IdentityDbContext<AppUser>(options)
+    : IdentityDbContext<ApplicationUser>(options)
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 

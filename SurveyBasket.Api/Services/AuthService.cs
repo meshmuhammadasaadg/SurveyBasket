@@ -6,14 +6,16 @@ using System.Security.Cryptography;
 
 namespace SurveyBasket.Api.Services;
 
-public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager
-    , IJwtProvider jwtProvider, IEmailSender emailSender, IHttpContextAccessor httpContextAccessor) : IAuthService
+public class AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager
+    , IJwtProvider jwtProvider, IEmailSender emailSender, IHttpContextAccessor httpContextAccessor
+    , ILogger<AuthService> logger) : IAuthService
 {
-    private readonly UserManager<AppUser> _userManager = userManager;
-    private readonly SignInManager<AppUser> _signInManager = signInManager;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
     private readonly IEmailSender _emailSender = emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly ILogger<AuthService> _logger = logger;
     private readonly int _refreshTokenExpiryDays = 14;
 
     public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
@@ -23,7 +25,7 @@ public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser
         if (emailIsExisting)
             Result.Failure<AuthResponse>(UserErrors.DuplicatedEmail);
 
-        var user = request.Adapt<AppUser>();
+        var user = request.Adapt<ApplicationUser>();
 
         var result = await _userManager.CreateAsync(user, request.Password);
 
@@ -34,8 +36,10 @@ public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser
             return Result.Failure<AuthResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
         }
 
-        //BackgroundJob.Enqueue(() => );
-        await SendConfirmationEmail(user);
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+        await SendConfirmationEmail(user, code);
 
         return Result.Success();
     }
@@ -173,16 +177,64 @@ public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser
         if (user.EmailConfirmed)
             return Result.Failure(UserErrors.EmailIsConfirmed);
 
-        await SendConfirmationEmail(user);
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+        await SendConfirmationEmail(user, code);
 
         return Result.Success();
     }
 
-    private async Task SendConfirmationEmail(AppUser user)
+    public async Task<Result> SendResetPasswordCodeAsync(string email)
     {
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+            return Result.Success();
+
+        if (!user.EmailConfirmed)
+            return Result.Failure(UserErrors.EmailNotConfirmed);
+
+        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+        _logger.LogInformation("Code is after base64UrlEncode {code}", code);
+
+        await SendResetPasswordEmail(user, code);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user is null || !user.EmailConfirmed)
+            return Result.Failure(UserErrors.InvalidCode);
+
+        IdentityResult result;
+
+        try
+        {
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+
+            result = await _userManager.ResetPasswordAsync(user, code, request.NewPassword);
+        }
+        catch (FormatException)
+        {
+            result = IdentityResult.Failed(_userManager.ErrorDescriber.InvalidToken());
+        }
+
+        if (!result.Succeeded)
+        {
+            var error = result.Errors.First();
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status401Unauthorized));
+        }
+
+        return Result.Success();
+    }
+    private async Task SendConfirmationEmail(ApplicationUser user, string code)
+    {
         var origin = _httpContextAccessor.HttpContext!.Request.Headers.Origin;
 
         var emailBody = await EmailBodyBuilder.GenerateEmailBody("EmailConfirmation",
@@ -192,6 +244,19 @@ public class AuthService(UserManager<AppUser> userManager, SignInManager<AppUser
             });
 
         BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Email Confirmation", emailBody));
+    }
+
+    private async Task SendResetPasswordEmail(ApplicationUser user, string code)
+    {
+        var origin = _httpContextAccessor.HttpContext!.Request.Headers.Origin;
+
+        var emailBody = await EmailBodyBuilder.GenerateEmailBody("EmailConfirmation",
+            new Dictionary<string, string>
+            {
+                ["{{confirmationLink}}"] = $"{origin}/auth/forget-password?userId={user.Id}&code={code}"
+            });
+
+        BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: change Password Email", emailBody));
     }
     private static string GenerateRefreshToken() =>
     Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));

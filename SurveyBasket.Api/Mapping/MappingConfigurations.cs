@@ -11,7 +11,7 @@ public class MappingConfigurations : IRegister
 
 
         //Auth Mapping
-        config.NewConfig<RegisterRequest, AppUser>()
+        config.NewConfig<RegisterRequest, ApplicationUser>()
             .Map(dest => dest.UserName, src => $"{src.Email}");
     }
 }
