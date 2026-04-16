@@ -1,9 +1,9 @@
 ﻿
 namespace SurveyBasket.Api.Presistence.EntitiesConfigurations;
 
-public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
+public class AppUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
 {
-    public void Configure(EntityTypeBuilder<AppUser> builder)
+    public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
         builder
             .OwnsMany(x => x.RefreshTokens)

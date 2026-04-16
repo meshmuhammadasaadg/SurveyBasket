@@ -8,6 +8,6 @@ public sealed class Vote
     public DateTime SubmittedOn { get; set; } = DateTime.UtcNow;
 
     public Poll poll { get; set; } = default!;
-    public AppUser User { get; set; } = default!;
+    public ApplicationUser User { get; set; } = default!;
     public ICollection<VoteAnswer> VoteAnswers { get; set; } = [];
 }

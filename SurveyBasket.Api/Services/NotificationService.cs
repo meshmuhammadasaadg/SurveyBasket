@@ -3,12 +3,12 @@ using SurveyBasket.Api.Helpers;
 
 namespace SurveyBasket.Api.Services;
 
-public class NotificationService(ApplicationDbContext context, UserManager<AppUser> userManager,
+public class NotificationService(ApplicationDbContext context, UserManager<ApplicationUser> userManager,
     IHttpContextAccessor httpContextAccessor, IEmailSender emailSender)
     : INotificationService
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly UserManager<AppUser> _userManager = userManager;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly IEmailSender _emailSender = emailSender;
 
