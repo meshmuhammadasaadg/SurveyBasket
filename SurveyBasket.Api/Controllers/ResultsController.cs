@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using SurveyBasket.Api.Services;
+﻿using SurveyBasket.Api.Abstractions.DataSeeding;
+using SurveyBasket.Api.Authentication.Filters;
 
 namespace SurveyBasket.Api.Controllers;
 
 [Route("api/polls/{pollId}/[controller]")]
 [ApiController]
-[Authorize]
+[HasPermission(Permissions.Results)]
 public class ResultsController(IVoteService voteService) : ControllerBase
 {
     private readonly IVoteService _voteService = voteService;

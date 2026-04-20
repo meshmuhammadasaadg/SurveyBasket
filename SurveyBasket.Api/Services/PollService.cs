@@ -1,6 +1,7 @@
 ﻿
 using Hangfire;
 using SurveyBasket.Api.Contracts.Polls;
+using SurveyBasket.Api.Persistence;
 
 namespace SurveyBasket.Api.Services;
 
