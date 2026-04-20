@@ -2,6 +2,7 @@
 using SurveyBasket.Api.Contracts.Results;
 using SurveyBasket.Api.Contracts.Votes;
 using SurveyBasket.Api.Errors;
+using SurveyBasket.Api.Persistence;
 
 namespace SurveyBasket.Api.Services;
 

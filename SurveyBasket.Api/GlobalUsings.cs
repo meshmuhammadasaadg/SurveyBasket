@@ -1,5 +1,4 @@
 ﻿global using FluentValidation;
-global using FluentValidation.AspNetCore;
 global using Mapster;
 global using MapsterMapper;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,7 +16,7 @@ global using SurveyBasket.Api.Contracts.User;
 global using SurveyBasket.Api.Entities;
 global using SurveyBasket.Api.Errors;
 global using SurveyBasket.Api.Extensions;
-global using SurveyBasket.Api.Presistence;
+global using SurveyBasket.Api.Persistence;
 global using SurveyBasket.Api.Services;
 global using System.Reflection;
 global using System.Text;
