@@ -86,15 +86,24 @@ public class AuthService(UserManager<ApplicationUser> userManager, SignInManager
 
     public async Task<Result<AuthResponse>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-
-        if (user is null)
+        if (await _userManager.FindByEmailAsync(email) is not { } user)
             return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
 
-        var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
+        if (user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.IsDisabled);
+
+        var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
 
         if (!result.Succeeded)
-            return Result.Failure<AuthResponse>(result.IsNotAllowed ? UserErrors.EmailNotConfirmed : UserErrors.InvalidCredentials);
+        {
+            var error = result.IsNotAllowed
+                ? UserErrors.EmailNotConfirmed
+                : result.IsLockedOut
+                ? UserErrors.LockedUser
+                : UserErrors.InvalidCredentials;
+
+            return Result.Failure<AuthResponse>(error);
+        }
 
         var (userRoles, userPermissions) = await GetUserRolesAndPermissons(user, cancellationToken);
 
@@ -127,10 +136,16 @@ public class AuthService(UserManager<ApplicationUser> userManager, SignInManager
         if (user is null)
             return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
 
+        if (user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.IsDisabled);
+
         var userRefreshToken = user.RefreshTokens.FirstOrDefault(c => c.Token == refreshToken && c.IsActive);
 
         if (userRefreshToken is null)
             return Result.Failure<AuthResponse>(UserErrors.InvalidToken);
+
+        if (user.LockoutEnd > DateTime.UtcNow)
+            return Result.Failure<AuthResponse>(UserErrors.LockedUser);
 
         userRefreshToken.RevokedOn = DateTime.UtcNow;
 
