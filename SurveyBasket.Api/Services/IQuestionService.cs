@@ -1,10 +1,11 @@
-﻿using SurveyBasket.Api.Contracts.Questions;
+﻿using SurveyBasket.Api.Contracts.Common;
+using SurveyBasket.Api.Contracts.Questions;
 
 namespace SurveyBasket.Api.Services;
 
 public interface IQuestionService
 {
-    Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int pollId, CancellationToken cancellationToken = default);
+    Task<Result<PaginatedList<QuestionResponse>>> GetAllAsync(int pollId, PageFilters pageFilters, CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<QuestionResponse>>> GetAvailableAsync(int pollId, string userId, CancellationToken cancellationToken = default);
     Task<Result<QuestionResponse>> GetByIdAsync(int pollId, int id, CancellationToken cancellationToken = default);
     Task<Result<QuestionResponse>> AddAsync(int pollId, QuestionRequest request, CancellationToken cancellationToken = default);
