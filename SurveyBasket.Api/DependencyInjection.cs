@@ -1,10 +1,12 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Api.Authentication.Filters;
 using SurveyBasket.Api.Health;
 using SurveyBasket.Api.Settings;
+using System.Threading.RateLimiting;
 
 namespace SurveyBasket.Api;
 
@@ -61,7 +63,8 @@ public static class DependencyInjection
             .AddSqlServer(connectionString)
             .AddHangfire(options => { options.MinimumAvailableServers = 1; })
             .AddCheck<MailProviderHealthCheck>(name: "mail service");
-        //.AddDbContextCheck<ApplicationDbContext>(name: "Database");
+
+        services.AddRateLimitingConfig();
 
         return services;
     }
@@ -141,6 +144,71 @@ public static class DependencyInjection
             .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
 
         services.AddHangfireServer();
+
+        return services;
+    }
+    private static IServiceCollection AddRateLimitingConfig(this IServiceCollection services)
+    {
+        services.AddRateLimiter(rateLimitingOptions =>
+        {
+            rateLimitingOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            rateLimitingOptions.AddPolicy(RateLimiting.IpLimiting, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(20)
+                    }
+                )
+            );
+
+            rateLimitingOptions.AddPolicy(RateLimiting.UserLimiting, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.GetUserId(),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(20)
+                    }
+                )
+            );
+
+            rateLimitingOptions.AddConcurrencyLimiter(RateLimiting.ConcurrencyLimiting, options =>
+            {
+                options.PermitLimit = 1000;
+                options.QueueLimit = 100;
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+
+            //rateLimitingOptions.AddTokenBucketLimiter("tokenBucket", options =>
+            //{
+            //    options.TokenLimit = 100;
+            //    options.QueueLimit = 5;
+            //    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            //    options.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+            //    options.TokensPerPeriod = 2;
+            //    options.AutoReplenishment = true;
+            //});
+
+            //rateLimitingOptions.AddFixedWindowLimiter("fixedWindow", options =>
+            //{
+            //    options.PermitLimit = 10;
+            //    options.Window = TimeSpan.FromSeconds(5);
+            //    options.QueueLimit = 5;
+            //    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            //});
+
+            //rateLimitingOptions.AddSlidingWindowLimiter("slidingWindow", options =>
+            //{
+            //    options.PermitLimit = 10;
+            //    options.Window = TimeSpan.FromSeconds(5);
+            //    options.SegmentsPerWindow = 10;
+            //    options.QueueLimit = 5;
+            //    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            //});
+        });
 
         return services;
     }

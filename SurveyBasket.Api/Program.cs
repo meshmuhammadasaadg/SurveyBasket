@@ -42,7 +42,8 @@ var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using var scope = scopeFactory.CreateScope();
 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-RecurringJob.AddOrUpdate("SendNewPollsNotification", () => notificationService.SendNewPollsNotification(null), Cron.Daily);
+RecurringJob.AddOrUpdate("SendNewPollsNotification",
+    () => notificationService.SendNewPollsNotification(null), Cron.Daily);
 
 app.UseCors();
 
@@ -51,6 +52,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseExceptionHandler();
+
+app.UseRateLimiter();
 
 app.MapHealthChecks("health", new HealthCheckOptions
 {
