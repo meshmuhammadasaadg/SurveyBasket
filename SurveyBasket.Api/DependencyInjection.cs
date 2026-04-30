@@ -1,9 +1,9 @@
-﻿
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Api.Authentication.Filters;
+using SurveyBasket.Api.Health;
 using SurveyBasket.Api.Settings;
 
 namespace SurveyBasket.Api;
@@ -57,6 +57,11 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
 
+        services.AddHealthChecks()
+            .AddSqlServer(connectionString)
+            .AddHangfire(options => { options.MinimumAvailableServers = 1; })
+            .AddCheck<MailProviderHealthCheck>(name: "mail service");
+        //.AddDbContextCheck<ApplicationDbContext>(name: "Database");
 
         return services;
     }
