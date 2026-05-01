@@ -1,7 +1,6 @@
 ﻿
 using Hangfire;
 using SurveyBasket.Api.Contracts.Polls;
-using SurveyBasket.Api.Persistence;
 
 namespace SurveyBasket.Api.Services;
 
@@ -18,6 +17,13 @@ public class PollService(ApplicationDbContext context, INotificationService noti
             .Where(c => c.IsPublished && c.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && c.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow))
             .AsNoTracking()
             .ProjectToType<PollResponse>()
+            .ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<PollResponseV2>> GetCurrentAsyncV2(CancellationToken cancellationToken = default) =>
+        await _context.Polls
+            .Where(c => c.IsPublished && c.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && c.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow))
+            .AsNoTracking()
+            .ProjectToType<PollResponseV2>()
             .ToListAsync(cancellationToken);
 
     public async Task<Result<PollResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default)
