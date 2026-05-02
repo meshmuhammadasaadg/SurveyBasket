@@ -2,14 +2,14 @@
 
 <div align="center">
 
-![.NET](https://img.shields.io/badge/.NET%209-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![.NET](https://img.shields.io/badge/.NET%2010-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=csharp&logoColor=white)
 ![Entity Framework](https://img.shields.io/badge/Entity%20Framework%20Core-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 
-A production-ready **REST API** for managing surveys, questions, and votes — built with clean architecture principles and modern .NET 9 practices.
+A production-ready **REST API** for managing surveys, questions, and votes — built with clean architecture principles and modern .NET 10 practices.
 
 </div>
 
@@ -31,7 +31,7 @@ A production-ready **REST API** for managing surveys, questions, and votes — b
 
 ## Overview
 
-**SurveyBasket** is a full-featured survey management system built as a RESTful API with .NET 9. It allows administrators to create polls with questions, manage users and roles, and collect and analyze votes — all secured with JWT-based authentication, refresh tokens, and fine-grained role/permission-based authorization.
+**SurveyBasket** is a full-featured survey management system built as a RESTful API with .NET 10. It allows administrators to create polls with questions, manage users and roles, and collect and analyze votes — all secured with JWT-based authentication, refresh tokens, and fine-grained role/permission-based authorization.
 
 ---
 
@@ -92,7 +92,7 @@ A production-ready **REST API** for managing surveys, questions, and votes — b
 
 | Layer           | Technology                                     |
 | --------------- | ---------------------------------------------- |
-| Framework       | ASP.NET Core 9 Web API                         |
+| Framework       | ASP.NET Core 10 Web API                        |
 | ORM             | Entity Framework Core                          |
 | Database        | SQL Server                                     |
 | Authentication  | ASP.NET Core Identity + JWT Bearer             |
