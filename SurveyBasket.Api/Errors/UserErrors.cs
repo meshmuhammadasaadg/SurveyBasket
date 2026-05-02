@@ -1,7 +1,7 @@
 ﻿
 namespace SurveyBasket.Api.Errors;
 
-public static class UserErrors
+public record UserErrors
 {
     public static Error NotFound(string Id) =>
         new("User.NotFound", $"user with this ID '{Id}' was not found", StatusCodes.Status404NotFound);

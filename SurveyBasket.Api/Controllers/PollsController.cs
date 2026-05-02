@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using SurveyBasket.Api.Abstractions.DataSeeding;
-using SurveyBasket.Api.Abstractions.DataSeeding.Roles;
 using SurveyBasket.Api.Authentication.Filters;
 using SurveyBasket.Api.Contracts.Polls;
 
@@ -27,7 +26,7 @@ public class PollsController(IPollService pollService) : ControllerBase
 
     [MapToApiVersion(1)]
     [HttpGet("current")]
-    [Authorize(Roles = MemberRole.Name)]
+    [Authorize(Roles = DefaultRoles.Member.Name)]
     [EnableRateLimiting(RateLimiting.UserLimiting)]
     public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
     {
@@ -38,7 +37,7 @@ public class PollsController(IPollService pollService) : ControllerBase
 
     [MapToApiVersion(2)]
     [HttpGet("current")]
-    [Authorize(Roles = MemberRole.Name)]
+    [Authorize(Roles = DefaultRoles.Member.Name)]
     [EnableRateLimiting(RateLimiting.UserLimiting)]
     public async Task<IActionResult> GetCurrentV2(CancellationToken cancellationToken)
     {
@@ -78,7 +77,7 @@ public class PollsController(IPollService pollService) : ControllerBase
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
-    [HttpPut("{id}/togglePublish")]
+    [HttpPut("{id}/toggle-publish")]
     [HasPermission(Permissions.UpdatePolls)]
     public async Task<IActionResult> TogglePublish([FromRoute] int id, CancellationToken cancellationToken)
     {

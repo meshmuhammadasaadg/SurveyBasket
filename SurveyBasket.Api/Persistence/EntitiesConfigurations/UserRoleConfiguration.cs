@@ -1,5 +1,4 @@
-﻿using SurveyBasket.Api.Abstractions.DataSeeding.Roles;
-using SurveyBasket.Api.Abstractions.DataSeeding.Users;
+﻿using SurveyBasket.Api.Abstractions.DataSeeding;
 
 namespace SurveyBasket.Api.Persistence.EntitiesConfigurations;
 
@@ -9,8 +8,8 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<IdentityUserRole<s
     {
         var adminUserRole = new IdentityUserRole<string>
         {
-            UserId = AdminUser.Id,
-            RoleId = AdminRole.Id
+            UserId = DefaultUsers.Admin.Id,
+            RoleId = DefaultRoles.Admin.Id
         };
 
         builder.HasData(adminUserRole);

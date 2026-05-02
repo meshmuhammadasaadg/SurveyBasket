@@ -1,22 +1,14 @@
-﻿using Asp.Versioning;
-using Hangfire;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.RateLimiting;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
-using SurveyBasket.Api.Authentication.Filters;
-using SurveyBasket.Api.Health;
-using SurveyBasket.Api.Settings;
-using System.Threading.RateLimiting;
-
-namespace SurveyBasket.Api;
+﻿namespace SurveyBasket.Api;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
-        services.AddOpenApi();
+        services
+            .AddEndpointsApiExplorer()
+            .AddOpenApi();
+
         services.AddDistributedMemoryCache();   //caching service
 
         var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -51,7 +43,10 @@ public static class DependencyInjection
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
 
-        services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+        services.AddOptions<MailSettings>()
+            .BindConfiguration(nameof(MailSettings))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
@@ -66,7 +61,22 @@ public static class DependencyInjection
             .AddCheck<MailProviderHealthCheck>(name: "mail service");
 
         services.AddRateLimitingConfig();
+        services.AddApiVersioningConfig();
 
+        return services;
+    }
+    private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
+    {
+        //add mapster
+        var mappingConfig = TypeAdapterConfig.GlobalSettings;
+        mappingConfig.Scan(Assembly.GetExecutingAssembly());
+
+        services.AddSingleton<IMapper>(new Mapper(mappingConfig));
+
+        return services;
+    }
+    private static IServiceCollection AddApiVersioningConfig(this IServiceCollection services)
+    {
         services.AddApiVersioning(options =>
         {
             options.DefaultApiVersion = new ApiVersion(1);
@@ -80,16 +90,6 @@ public static class DependencyInjection
             options.GroupNameFormat = "'v'V";
             options.SubstituteApiVersionInUrl = true;
         });
-
-        return services;
-    }
-    private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
-    {
-        //add mapster
-        var mappingConfig = TypeAdapterConfig.GlobalSettings;
-        mappingConfig.Scan(Assembly.GetExecutingAssembly());
-
-        services.AddSingleton<IMapper>(new Mapper(mappingConfig));
 
         return services;
     }
@@ -112,7 +112,6 @@ public static class DependencyInjection
         services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddTransient<IAuthorizationPolicyProvider, PermissionsAuthorizationPolicyProvider>();
 
-        //services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.AddOptions<JwtOptions>()
                 .BindConfiguration(JwtOptions.SectionName)
                 .ValidateDataAnnotations()

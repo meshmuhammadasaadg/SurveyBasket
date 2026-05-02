@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Api.Errors;
 
-public static class QuestionErrors
+public record QuestionErrors
 {
     public static readonly Error DuplicatedQuestion =
         new("Question.DuplicatedContent", "Cannot duplicated question Content for the same poll", StatusCodes.Status409Conflict);

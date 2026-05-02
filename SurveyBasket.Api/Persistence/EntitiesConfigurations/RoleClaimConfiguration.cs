@@ -1,5 +1,4 @@
 ﻿using SurveyBasket.Api.Abstractions.DataSeeding;
-using SurveyBasket.Api.Abstractions.DataSeeding.Roles;
 
 namespace SurveyBasket.Api.Persistence.EntitiesConfigurations;
 
@@ -18,7 +17,7 @@ public class RoleClaimConfiguration : IEntityTypeConfiguration<IdentityRoleClaim
                 Id = i + 1,
                 ClaimType = Permissions.Type,
                 ClaimValue = permissions[i],
-                RoleId = AdminRole.Id
+                RoleId = DefaultRoles.Admin.Id
             });
         }
 

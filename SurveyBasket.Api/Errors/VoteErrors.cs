@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Api.Errors;
 
-public static class VoteErrors
+public record VoteErrors
 {
     public static readonly Error VoteNotFound =
         new("Vote.NotFound", "No Vote was found with the given ID", StatusCodes.Status404NotFound);

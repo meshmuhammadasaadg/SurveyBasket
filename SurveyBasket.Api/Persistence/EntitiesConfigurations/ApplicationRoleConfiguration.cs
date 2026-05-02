@@ -1,4 +1,4 @@
-﻿using SurveyBasket.Api.Abstractions.DataSeeding.Roles;
+﻿using SurveyBasket.Api.Abstractions.DataSeeding;
 
 namespace SurveyBasket.Api.Persistence.EntitiesConfigurations;
 
@@ -8,18 +8,18 @@ public class ApplicationRoleConfiguration : IEntityTypeConfiguration<Application
     {
         var adminRole = new ApplicationRole
         {
-            Id = AdminRole.Id,
-            Name = AdminRole.Name,
-            NormalizedName = AdminRole.NormalizedName,
-            ConcurrencyStamp = AdminRole.ConcurrencyStamp,
+            Id = DefaultRoles.Admin.Id,
+            Name = DefaultRoles.Admin.Name,
+            NormalizedName = DefaultRoles.Admin.NormalizedName,
+            ConcurrencyStamp = DefaultRoles.Admin.ConcurrencyStamp,
         };
 
         var memberRole = new ApplicationRole
         {
-            Id = MemberRole.Id,
-            Name = MemberRole.Name,
-            NormalizedName = MemberRole.NormalizedName,
-            ConcurrencyStamp = MemberRole.ConcurrencyStamp,
+            Id = DefaultRoles.Member.Id,
+            Name = DefaultRoles.Member.Name,
+            NormalizedName = DefaultRoles.Member.NormalizedName,
+            ConcurrencyStamp = DefaultRoles.Member.ConcurrencyStamp,
             IsDefault = true
         };
 

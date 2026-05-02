@@ -1,7 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
-using SurveyBasket.Api.Abstractions.DataSeeding.Roles;
+using SurveyBasket.Api.Abstractions.DataSeeding;
 using SurveyBasket.Api.Helpers;
 using System.Security.Cryptography;
 
@@ -79,7 +79,7 @@ public class AuthService(UserManager<ApplicationUser> userManager, SignInManager
                 error.Description, StatusCodes.Status400BadRequest));
         }
 
-        await _userManager.AddToRoleAsync(user, MemberRole.Name);
+        await _userManager.AddToRoleAsync(user, DefaultRoles.Member.Name);
 
         return Result.Success();
     }
@@ -218,7 +218,7 @@ public class AuthService(UserManager<ApplicationUser> userManager, SignInManager
             return Result.Success();
 
         if (!user.EmailConfirmed)
-            return Result.Failure(UserErrors.EmailNotConfirmed);
+            return Result.Failure(UserErrors.EmailNotConfirmed with { StatusCode = StatusCodes.Status400BadRequest });
 
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

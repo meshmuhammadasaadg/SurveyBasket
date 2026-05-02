@@ -1,4 +1,4 @@
-﻿using SurveyBasket.Api.Abstractions.DataSeeding.Roles;
+﻿using SurveyBasket.Api.Abstractions.DataSeeding;
 
 namespace SurveyBasket.Api.Services;
 
@@ -16,7 +16,7 @@ public class UserService(UserManager<ApplicationUser> userManager,
                on u.Id equals ur.UserId
                join r in _context.Roles
                on ur.RoleId equals r.Id into roles
-               where roles.Any(c => c.Name != MemberRole.Name)
+               where roles.Any(c => c.Name != DefaultRoles.Member.Name)
                select new
                {
                    u.Id,

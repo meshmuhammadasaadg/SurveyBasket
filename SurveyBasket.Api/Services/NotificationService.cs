@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using SurveyBasket.Api.Abstractions.DataSeeding;
 using SurveyBasket.Api.Helpers;
-using SurveyBasket.Api.Persistence;
 
 namespace SurveyBasket.Api.Services;
 
@@ -31,9 +31,7 @@ public class NotificationService(ApplicationDbContext context, UserManager<Appli
                 .ToListAsync();
         }
 
-        // TODO : Select members only
-
-        var users = await _userManager.Users.ToListAsync();
+        var users = await _userManager.GetUsersInRoleAsync(DefaultRoles.Member.Name);
 
         var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin ?? "https://localhost:5001";
 

@@ -1,5 +1,5 @@
 ﻿
-using SurveyBasket.Api.Abstractions.DataSeeding.Users;
+using SurveyBasket.Api.Abstractions.DataSeeding;
 
 namespace SurveyBasket.Api.Persistence.EntitiesConfigurations;
 
@@ -9,17 +9,17 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
     {
         var adminUser = new ApplicationUser
         {
-            Id = AdminUser.Id,
-            FirstName = AdminUser.FirstName,
-            LastName = AdminUser.LastName,
-            UserName = AdminUser.Email,
-            NormalizedUserName = AdminUser.Email.ToUpper(),
-            Email = AdminUser.Email,
-            NormalizedEmail = AdminUser.Email.ToUpper(),
+            Id = DefaultUsers.Admin.Id,
+            FirstName = DefaultUsers.Admin.FirstName,
+            LastName = DefaultUsers.Admin.LastName,
+            UserName = DefaultUsers.Admin.Email,
+            NormalizedUserName = DefaultUsers.Admin.Email.ToUpper(),
+            Email = DefaultUsers.Admin.Email,
+            NormalizedEmail = DefaultUsers.Admin.Email.ToUpper(),
             EmailConfirmed = true,
-            SecurityStamp = AdminUser.SecurityStamp,
-            ConcurrencyStamp = AdminUser.ConcurrencyStamp,
-            PasswordHash = "AQAAAAIAAYagAAAAELTBMSaom3U7o1sXnbkVgZUYbwtWeZdqQOvpIP71BBpUK9J7wHhW7ZviRQbkmXKIOg=="
+            SecurityStamp = DefaultUsers.Admin.SecurityStamp,
+            ConcurrencyStamp = DefaultUsers.Admin.ConcurrencyStamp,
+            PasswordHash = DefaultUsers.Admin.PasswordHash,
         };
 
         builder.HasData(adminUser);
