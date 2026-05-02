@@ -131,9 +131,9 @@ SurveyBasket/
 
 ### Prerequisites
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [SQL Server](https://www.microsoft.com/en-us/sql-server)
-- [Visual Studio 2022+](https://visualstudio.microsoft.com/) or [VS Code](https://code.visualstudio.com/)
+- [Visual Studio 2026+](https://visualstudio.microsoft.com/) or [VS Code](https://code.visualstudio.com/)
 
 ### Setup
 
@@ -303,3 +303,17 @@ The course covers 35 sections and 37+ hours of content including HTTP fundamenta
 ## 📄 License
 
 This project is intended for educational purposes as part of the DevCreed course curriculum.
+
+---
+
+## 👨‍💻 Author
+
+<div align="center">
+
+Built with 💙 by **Muhammad Asaad**
+
+[![GitHub](https://img.shields.io/badge/GitHub-meshmuhammadasaadg-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/meshmuhammadasaadg)
+
+_"Code is like humor. When you have to explain it, it's bad."_
+
+</div>
